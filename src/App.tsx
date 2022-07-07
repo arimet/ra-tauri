@@ -1,26 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// in src/App.js
+import * as React from "react";
+import { Admin, EditGuesser, ListGuesser, Resource, ShowGuesser } from 'react-admin';
+import localStorageDataProvider from 'ra-data-local-storage';
+import { PostCreate } from "./post/PostCreate";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const dataProvider = localStorageDataProvider({
+  defaultData: {
+      posts: [
+          { id: 0, title: 'Hello, world!' },
+          { id: 1, title: 'FooBar' },
+      ],
+      comments: [
+          { id: 0, post_id: 0, author: 'John Doe', body: 'Sensational!' },
+          { id: 1, post_id: 0, author: 'Jane Doe', body: 'I agree' },
+      ],
+  },
+  loggingEnabled: true
+});
+
+const App = () => (
+    <Admin dataProvider={dataProvider}>
+        <Resource name="posts" list={ListGuesser} show={ShowGuesser} edit={EditGuesser} create={PostCreate} />
+    </Admin>
+);
 
 export default App;
