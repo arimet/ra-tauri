@@ -1,26 +1,59 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// in src/App.js
+import * as React from "react";
+import {
+  Admin,
+  EditGuesser,
+  ListGuesser,
+  Resource,
+  ShowGuesser,
+} from "react-admin";
 
-function App() {
+import { PostCreate } from "./post/PostCreate";
+
+// import raDataTauriForage from "./dataProvider/ra-data-local-forage";
+import raDataTauriForage from "./dataProvider/ra-data-local-forage-2";
+import { CommentCreate } from "./comment/CommentCreate";
+import { CommentList } from "./comment/CommentList";
+import { PostShow } from "./post/PostShow";
+
+const App = () => {
+  const [dataProvider, setDataProvider] = React.useState(null);
+
+  React.useEffect(() => {
+    async function createDataProvider() {
+      const localForageProvider = await raDataTauriForage({
+        defaultData: {
+          posts: [
+            { id: 0, title: "Hello, world!" },
+            { id: 1, title: "FooBar" },
+          ],
+          comments: [
+            { id: 0, post_id: 0, author: "John Doe", body: "Sensational!" },
+            { id: 1, post_id: 0, author: "Jane Doe", body: "I agree" },
+          ],
+        },
+      });
+      setDataProvider(localForageProvider);
+    }
+    createDataProvider()
+  }, []);
+
+  // hide the admin until the data provider is ready
+  if (!dataProvider) return <p>Loading...</p>;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    // @ts-ignore
+    <Admin dataProvider={dataProvider}>
+      <Resource
+        name="posts"
+        list={ListGuesser}
+        show={PostShow}
+        edit={EditGuesser}
+        create={PostCreate}
+      />
+      <Resource name="comments" list={CommentList} show={ShowGuesser} edit={EditGuesser} create={CommentCreate} />
+    </Admin>
   );
-}
+};
 
 export default App;
